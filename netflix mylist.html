@@ -1,0 +1,857 @@
+// MYLIST
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamFlix - My List</title>
+
+    <style>
+        /* RESET */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #111;
+            color: white;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            height: 70px;
+            background-color: #111;
+            display: flex;
+            align-items: center;
+            padding: 0 45px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            border-bottom: 1px solid #222;
+        }
+
+        .logo {
+            color: #e50914;
+            font-size: 28px;
+            font-weight: bold;
+            margin-right: 45px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 15px;
+            padding-bottom: 7px;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #e50914;
+        }
+
+        .nav-links a.active {
+            font-weight: bold;
+            border-bottom: 2px solid #e50914;
+        }
+
+        .nav-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-small {
+            width: 200px;
+            padding: 9px 14px;
+            background-color: #222;
+            border: 1px solid #444;
+            border-radius: 20px;
+            outline: none;
+            color: white;
+        }
+
+        .search-small::placeholder {
+            color: #aaa;
+        }
+
+        .login-btn {
+            display: inline-block;
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 10px 21px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .login-btn:hover,
+        .watch-btn:hover,
+        .browse-btn:hover {
+            background-color: #b20710;
+        }
+
+        /* HEADER WITH BACKGROUND IMAGE */
+        .page-header {
+            margin-top: 70px;
+            padding: 75px 50px 55px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(0, 0, 0, 0.88) 0%,
+                    rgba(0, 0, 0, 0.62) 55%,
+                    rgba(0, 0, 0, 0.35) 100%
+                ),
+                linear-gradient(
+                    to bottom,
+                    rgba(17, 17, 17, 0.05),
+                    #111 100%
+                ),
+                url("https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=1800&q=85");
+
+            background-size: cover;
+            background-position: center 45%;
+            background-repeat: no-repeat;
+        }
+
+        .page-header h1 {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .page-header p {
+            color: #ddd;
+            font-size: 17px;
+            line-height: 1.6;
+            max-width: 550px;
+        }
+
+        /* FILTER BUTTONS */
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding: 25px 20px 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background-color: #222;
+            color: #ddd;
+            border: 1px solid #444;
+            padding: 10px 19px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        .filter-btn:hover {
+            background-color: #333;
+        }
+
+        .filter-btn.active {
+            background-color: #e50914;
+            border-color: #e50914;
+            color: white;
+        }
+
+        /* LIST SECTION */
+        .list-section {
+            padding: 15px 45px 45px;
+            min-height: 300px;
+        }
+
+        .list-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .list-heading h2 {
+            font-size: 25px;
+        }
+
+        .list-count {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        #searchStatus {
+            color: #aaa;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        /* MOVIE GRID */
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        /* MOVIE CARDS */
+        .movie-card {
+            background-color: #1d1d1d;
+            border-radius: 7px;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.04);
+            z-index: 5;
+        }
+
+        .movie-card img {
+            display: block;
+            width: 100%;
+            height: 270px;
+            object-fit: cover;
+        }
+
+        .movie-info {
+            padding: 12px;
+        }
+
+        .movie-info h3 {
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .movie-details {
+            color: #aaa;
+            font-size: 12px;
+            margin-bottom: 9px;
+        }
+
+        .rating {
+            color: #f5c518;
+            font-size: 13px;
+        }
+
+        /* REMOVE BUTTON */
+        .remove-btn {
+            position: absolute;
+            top: 9px;
+            right: 9px;
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            font-size: 21px;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .remove-btn:hover {
+            background-color: #e50914;
+        }
+
+        /* WATCH BUTTON */
+        .watch-btn {
+            display: inline-block;
+            margin-top: 11px;
+            padding: 9px 13px;
+            background-color: #e50914;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        /* NO RESULTS */
+        #noResults {
+            display: none;
+            text-align: center;
+            padding: 55px 15px;
+            color: #aaa;
+        }
+
+        #noResults h2 {
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        /* EMPTY LIST */
+        .empty-message {
+            display: none;
+            text-align: center;
+            padding: 70px 20px;
+            color: #888;
+        }
+
+        .empty-message h2 {
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .empty-message p {
+            margin-bottom: 20px;
+        }
+
+        .browse-btn {
+            display: inline-block;
+            background-color: #e50914;
+            color: white;
+            padding: 11px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        /* FOOTER */
+        footer {
+            margin-top: 30px;
+            padding: 40px 45px;
+            background-color: #0d0d0d;
+            border-top: 1px solid #292929;
+        }
+
+        .footer-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .footer-logo {
+            color: #e50914;
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .footer-text {
+            color: #777;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #888;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .copyright {
+            color: #666;
+            font-size: 12px;
+        }
+
+        /* TABLET */
+        @media (max-width: 1200px) {
+            .movie-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+
+            .movie-card img {
+                height: 250px;
+            }
+        }
+
+        @media (max-width: 850px) {
+            .navbar {
+                padding: 15px 25px;
+                height: auto;
+                min-height: 70px;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .logo {
+                margin-right: 10px;
+            }
+
+            .nav-links {
+                gap: 18px;
+            }
+
+            .search-small {
+                display: none;
+            }
+
+            .page-header {
+                margin-top: 100px;
+            }
+
+            .movie-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .list-section {
+                padding-left: 30px;
+                padding-right: 30px;
+            }
+        }
+
+        /* MOBILE */
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 15px 18px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+                gap: 16px;
+                flex-wrap: wrap;
+            }
+
+            .nav-links a {
+                font-size: 12px;
+            }
+
+            .nav-right {
+                margin-left: auto;
+            }
+
+            .page-header {
+                margin-top: 125px;
+                min-height: 250px;
+                padding: 45px 22px;
+                background-position: center;
+            }
+
+            .page-header h1 {
+                font-size: 36px;
+            }
+
+            .page-header p {
+                font-size: 14px;
+            }
+
+            .filters {
+                gap: 8px;
+                padding: 22px 12px;
+            }
+
+            .filter-btn {
+                padding: 9px 13px;
+                font-size: 12px;
+            }
+
+            .list-section {
+                padding: 15px 18px 30px;
+            }
+
+            .list-heading h2 {
+                font-size: 20px;
+            }
+
+            .movie-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 14px;
+            }
+
+            .movie-card img {
+                height: 220px;
+            }
+
+            .movie-info {
+                padding: 10px;
+            }
+
+            .movie-info h3 {
+                font-size: 14px;
+            }
+
+            .footer-top {
+                flex-direction: column;
+            }
+
+            footer {
+                padding: 35px 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">STREAMFLIX</div>
+
+        <ul class="nav-links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="movies.html">Movies</a></li>
+            <li><a href="series.html">Series</a></li>
+            <li><a href="mylist.html" class="active">My List</a></li>
+        </ul>
+
+        <div class="nav-right">
+            <input
+                type="text"
+                class="search-small"
+                id="navSearchInput"
+                placeholder="Search your list..."
+                aria-label="Search your list"
+            >
+
+            <a href="login.html" class="login-btn">Login</a>
+        </div>
+    </nav>
+
+    <!-- HEADER WITH BACKGROUND IMAGE -->
+    <section class="page-header">
+        <h1>My List</h1>
+        <p>Your favorite movies and series, all in one place.</p>
+    </section>
+
+    <!-- FILTER BUTTONS -->
+    <div class="filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="Movies">Movies</button>
+        <button class="filter-btn" data-filter="Series">Series</button>
+        <button class="filter-btn" data-filter="recent">Recently Added</button>
+    </div>
+
+    <!-- MY LIST SECTION -->
+    <section class="list-section">
+
+        <div class="list-heading">
+            <h2>My Collection</h2>
+            <span class="list-count" id="listCount">12 Titles</span>
+        </div>
+
+        <p id="searchStatus" aria-live="polite">Showing all titles.</p>
+
+        <div class="movie-grid" id="movieGrid">
+
+            <!-- OCEAN DEEP -->
+            <div class="movie-card" data-type="Movies">
+                <button class="remove-btn" aria-label="Remove Ocean Deep">×</button>
+                <img src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=500&q=85" alt="Ocean Deep">
+                <div class="movie-info">
+                    <h3>Ocean Deep</h3>
+                    <p class="movie-details">2026 • Adventure</p>
+                    <span class="rating">★ 8.5</span><br>
+                    <a href="#" class="watch-btn">Watch Now</a>
+                </div>
+            </div>
+
+            <!-- STORM -->
+            <div class="movie-card" data-type="Movies">
+                <button class="remove-btn" aria-label="Remove Storm">×</button>
+                <img src="https://images.unsplash.com/photo-1500673922987-e212871fec22?auto=format&fit=crop&w=500&q=85" alt="Storm">
+                <div class="movie-info">
+                    <h3>Storm</h3>
+                    <p class="movie-details">2026 • Action</p>
+                    <span class="rating">★ 8.2</span><br>
+                    <a href="#" class="watch-btn">Watch Now</a>
+                </div>
+            </div>
+
+            <!-- SECRET FOREST -->
+            <div class="movie-card" data-type="Series">
+                <button class="remove-btn" aria-label="Remove Secret Forest">×</button>
+                <img src="https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=500&q=85" alt="Secret Forest">
+                <div class="movie-info">
+                    <h3>Secret Forest</h3>
+                    <p class="movie-details">2026 • Mystery</p>
+                    <span class="rating">★ 8.8</span><br>
+                    <a href="#" class="watch-btn">Watch Now</a>
+                </div>
+            </div>
+
+            <!-- THE WATERFALL -->
+            <div class="movie-card" data-type="Series">
+                <button class="remove-btn" aria-label="Remove The Waterfall">×</button>
+                <img src="https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=500&q=85" alt="The Waterfall">
+                <div class="movie-info">
+                    <h3>The Waterfall</h3>
+                    <p class="movie-details">2025 • Fantasy</p>
+                    <span class="rating">★ 8.6</span><br>
+                    <a href="#" class="watch-btn">Watch Now</a>
+                </div>
+            </div>
+
+            <!-- DARK FOREST -->
+            <div class="movie-card" data-type="Movies">
+                <button class="remove-btn" aria-label="Remove Dark Forest">×</button>
+                <img src="https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=500&q=85" alt="Dark Forest">
+                <div class="movie-info">
+                    <h3>Dark Forest</h3>
+                    <p class="movie-details">2026 • Thriller</p>
+                    <span class="rating">★ 8.1</span><br>
+                    <a href="#" class="watch-btn">Watch Now</a>
+                </div>
+            </div>
+
+            <!-- LOST KINGDOM -->
+            <div class="movie-card" data-type="Series">
+                <button class="remove-btn" aria-label="Remove Lost Kingdom">×</button>
+                <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=500&q=85" alt="Lost Kingdom">
+                <div class="movie-info">
+                    <h3>Lost Kingdom</h3>
+                    <p class="movie-details">2026 • Fantasy</p>
+                    <span class="rating">★ 8.7</span><br>
+                    <a href="#" class="watch-btn">Watch Now</a>
+                </div>
+            </div>
+
+            <!-- GREEN WORLD -->
+            <div class="movie-card" data-type="Series">
+                <button class="remove-btn" aria-label="Remove Green World">×</button>
+                <img src="https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&fit=crop&w=500&q=85" alt="Green World">
+                <div class="movie-info">
+                    <h3>Green World</h3>
+                    <p class="movie-details">2026 • Documentary</p>
+                    <span class="rating">★ 8.5</span><br>
+                    <a href="#" class="watch-btn">Watch Now</a>
+                </div>
+            </div>
+
+            <!-- FOREST SECRETS -->
+            <div class="movie-card" data-type="Series">
+                <button class="remove-btn" aria-label="Remove Forest Secrets">×</button>
+                <img src="https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=500&q=85" alt="Forest Secrets">
+                <div class="movie-info">
+                    <h3>Forest Secrets</h3>
+                    <p class="movie-details">2025 • Mystery</p>
+                    <span class="rating">★ 8.7</span><br>
+                    <a href="#" class="watch-btn">Watch Now</a>
+                </div>
+            </div>
+
+            <!-- OPEN ROADS -->
+            <div class="movie-card" data-type="Movies">
+                <button class="remove-btn" aria-label="Remove Open Roads">×</button>
+                <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=500&q=85" alt="Open Roads">
+                <div class="movie-info">
+                    <h3>Open Roads</h3>
+                    <p class="movie-details">2026 • Adventure</p>
+                    <span class="rating">★ 8.6</span><br>
+                    <a href="#" class="watch-btn">Watch Now</a>
+                </div>
+            </div>
+
+            <!-- FROZEN WORLD -->
+            <div class="movie-card" data-type="Series">
+                <button class="remove-btn" aria-label="Remove Frozen World">×</button>
+                <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=500&q=85" alt="Frozen World">
+                <div class="movie-info">
+                    <h3>Frozen World</h3>
+                    <p class="movie-details">2025 • Drama</p>
+                    <span class="rating">★ 8.3</span><br>
+                    <a href="#" class="watch-btn">Watch Now</a>
+                </div>
+            </div>
+
+            <!-- WILD TERRITORY -->
+            <div class="movie-card" data-type="Series">
+                <button class="remove-btn" aria-label="Remove Wild Territory">×</button>
+                <img src="https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=500&q=85" alt="Wild Territory">
+                <div class="movie-info">
+                    <h3>Wild Territory</h3>
+                    <p class="movie-details">2026 • Adventure</p>
+                    <span class="rating">★ 8.9</span><br>
+                    <a href="#" class="watch-btn">Watch Now</a>
+                </div>
+            </div>
+
+            <!-- GOLDEN DAYS -->
+            <div class="movie-card" data-type="Series">
+                <button class="remove-btn" aria-label="Remove Golden Days">×</button>
+                <img src="https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=500&q=85" alt="Golden Days">
+                <div class="movie-info">
+                    <h3>Golden Days</h3>
+                    <p class="movie-details">2026 • Drama</p>
+                    <span class="rating">★ 8.4</span><br>
+                    <a href="#" class="watch-btn">Watch Now</a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- NO RESULTS MESSAGE -->
+        <div id="noResults">
+            <h2>No matching titles found</h2>
+            <p>Try another search or select a different filter.</p>
+        </div>
+
+        <!-- EMPTY LIST MESSAGE -->
+        <div class="empty-message">
+            <h2>Your list is empty</h2>
+            <p>Add movies and series to your list and find them here.</p>
+            <a href="movies.html" class="browse-btn">Browse Movies</a>
+        </div>
+
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-top">
+            <div>
+                <div class="footer-logo">STREAMFLIX</div>
+                <p class="footer-text">Your entertainment, your list.</p>
+            </div>
+
+            <div class="footer-links">
+                <a href="#">About Us</a>
+                <a href="#">Help Center</a>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Contact</a>
+            </div>
+        </div>
+
+        <p class="copyright">© 2026 StreamFlix. All rights reserved.</p>
+    </footer>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        let searchInput = document.getElementById("navSearchInput");
+        let movieCards = Array.from(document.querySelectorAll(".movie-card"));
+        let filterButtons = document.querySelectorAll(".filter-btn");
+        let activeFilter = "all";
+
+        // SEARCH AND FILTER
+        function updateMyList() {
+            let searchText = searchInput.value.trim().toLowerCase();
+            let visibleCount = 0;
+
+            movieCards.forEach(function(card) {
+                let title = card.querySelector("h3").textContent.toLowerCase();
+                let details = card.querySelector(".movie-details").textContent.toLowerCase();
+                let imageAlt = card.querySelector("img").alt.toLowerCase();
+                let type = card.dataset.type;
+                let isRecent = details.includes("2026");
+
+                let matchesSearch =
+                    searchText === "" ||
+                    title.includes(searchText) ||
+                    details.includes(searchText) ||
+                    imageAlt.includes(searchText);
+
+                let matchesFilter =
+                    activeFilter === "all" ||
+                    type === activeFilter ||
+                    (activeFilter === "recent" && isRecent);
+
+                let showCard = matchesSearch && matchesFilter;
+
+                card.style.display = showCard ? "" : "none";
+
+                if (showCard) {
+                    visibleCount++;
+                }
+            });
+
+            document.getElementById("listCount").textContent =
+                visibleCount + (visibleCount === 1 ? " Title" : " Titles");
+
+            let emptyMessage = document.querySelector(".empty-message");
+            let noResults = document.getElementById("noResults");
+            let searchStatus = document.getElementById("searchStatus");
+
+            let listIsEmpty = movieCards.length === 0;
+            let noVisibleCards = visibleCount === 0;
+
+            emptyMessage.style.display =
+                listIsEmpty && searchText === "" && activeFilter === "all"
+                    ? "block"
+                    : "none";
+
+            noResults.style.display =
+                !listIsEmpty && noVisibleCards ? "block" : "none";
+
+            if (listIsEmpty) {
+                searchStatus.textContent = "Your list is empty.";
+            } else if (searchText === "" && activeFilter === "all") {
+                searchStatus.textContent = "Showing all titles.";
+            } else if (visibleCount === 0) {
+                searchStatus.textContent = "No matching titles found.";
+            } else {
+                searchStatus.textContent =
+                    visibleCount +
+                    (visibleCount === 1 ? " title found." : " titles found.");
+            }
+        }
+
+        // SEARCH AS THE USER TYPES
+        searchInput.addEventListener("input", updateMyList);
+
+        // FILTER BUTTONS
+        filterButtons.forEach(function(button) {
+            button.addEventListener("click", function() {
+                filterButtons.forEach(function(item) {
+                    item.classList.remove("active");
+                });
+
+                button.classList.add("active");
+                activeFilter = button.dataset.filter;
+
+                updateMyList();
+            });
+        });
+
+        // REMOVE A TITLE
+        document.querySelectorAll(".remove-btn").forEach(function(button) {
+            button.addEventListener("click", function() {
+                let card = button.closest(".movie-card");
+
+                card.remove();
+
+                movieCards = movieCards.filter(function(item) {
+                    return item !== card;
+                });
+
+                updateMyList();
+            });
+        });
+
+        // WATCH BUTTON
+        document.querySelectorAll(".watch-btn").forEach(function(button) {
+            button.addEventListener("click", function(event) {
+                if (button.getAttribute("href") === "#") {
+                    event.preventDefault();
+                    alert("The video player will be added soon!");
+                }
+            });
+        });
+
+        // INITIAL UPDATE
+        updateMyList();
+    </script>
+
+</body>
+</html>
