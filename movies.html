@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamFlix - Movies</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #111;
+            color: white;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            height: 70px;
+            background-color: #111;
+            display: flex;
+            align-items: center;
+            padding: 0 45px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            border-bottom: 1px solid #222;
+        }
+
+        .logo {
+            color: #e50914;
+            font-size: 27px;
+            font-weight: bold;
+            margin-right: 40px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 15px;
+            padding-bottom: 7px;
+        }
+
+        .nav-links a:hover {
+            color: #e50914;
+        }
+
+        .nav-links a.active {
+            color: #e50914;
+            border-bottom: 2px solid #e50914;
+            font-weight: bold;
+        }
+
+        .nav-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* THE ONLY SEARCH FIELD */
+        .search-small {
+            width: 205px;
+            padding: 9px 13px;
+            border-radius: 20px;
+            border: 1px solid #444;
+            background-color: #222;
+            color: white;
+            outline: none;
+        }
+
+        .search-small::placeholder {
+            color: #aaa;
+        }
+
+        .login-btn {
+            background-color: #e50914;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .login-btn:hover {
+            background-color: #b20710;
+        }
+
+        /* HERO */
+        .hero {
+            height: 620px;
+            margin-top: 70px;
+            display: flex;
+            align-items: center;
+            padding-left: 48px;
+
+            background-image:
+                linear-gradient(
+                    to right,
+                    #000 5%,
+                    rgba(0,0,0,0.85) 25%,
+                    rgba(0,0,0,0.3) 65%,
+                    #111 100%
+                ),
+                linear-gradient(
+                    to top,
+                    #111 0%,
+                    transparent 35%
+                ),
+                url("https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1800&q=90");
+
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hero-content {
+            max-width: 500px;
+        }
+
+        .hero-number {
+            color: #e50914;
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .hero h1 {
+            font-size: 58px;
+            line-height: 1;
+            margin-bottom: 18px;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 15px;
+            color: #ddd;
+            font-size: 14px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .hero-description {
+            color: #ddd;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .play-btn,
+        .more-btn {
+            color: white;
+            border: none;
+            padding: 13px 25px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .play-btn {
+            background-color: #e50914;
+            font-weight: bold;
+        }
+
+        .play-btn:hover {
+            background-color: #b20710;
+        }
+
+        .more-btn {
+            background-color: #555;
+        }
+
+        .more-btn:hover {
+            background-color: #666;
+        }
+
+        /* SEARCH STATUS */
+        #searchStatus {
+            text-align: center;
+            color: #aaa;
+            padding: 20px 20px 0;
+        }
+
+        #noResults {
+            display: none;
+            text-align: center;
+            color: white;
+            font-size: 20px;
+            padding: 30px 20px;
+        }
+
+        /* MOVIE SECTIONS */
+        .section {
+            padding: 25px 45px;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-heading h2 {
+            font-size: 23px;
+        }
+
+        .see-all {
+            color: #e50914;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .see-all:hover {
+            text-decoration: underline;
+        }
+
+        /* MOVIE ROW */
+        .movie-row {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding: 5px 3px 25px;
+        }
+
+        .movie-row::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .movie-row::-webkit-scrollbar-track {
+            background: #181818;
+        }
+
+        .movie-row::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 10px;
+        }
+
+        /* MOVIE CARDS */
+        .movie-card {
+            min-width: 185px;
+            width: 185px;
+            background-color: #181818;
+            border-radius: 6px;
+            overflow: hidden;
+            transition: transform 0.3s;
+            flex-shrink: 0;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.05);
+            z-index: 5;
+        }
+
+        .movie-card img {
+            width: 100%;
+            height: 270px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .movie-info {
+            padding: 11px;
+        }
+
+        .movie-info h3 {
+            font-size: 15px;
+            line-height: 1.3;
+            margin-bottom: 7px;
+        }
+
+        .movie-details {
+            color: #aaa;
+            font-size: 12px;
+            margin-bottom: 7px;
+        }
+
+        .rating {
+            color: #f5c518;
+            font-size: 13px;
+        }
+
+        .quality {
+            border: 1px solid #666;
+            color: #aaa;
+            font-size: 9px;
+            padding: 2px 4px;
+            margin-left: 5px;
+        }
+
+        /* FOOTER */
+        footer {
+            border-top: 1px solid #292929;
+            margin-top: 35px;
+            padding: 40px 45px;
+            background-color: #0d0d0d;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 25px;
+        }
+
+        .footer-logo {
+            color: #e50914;
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .footer-tagline {
+            color: #777;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 28px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #888;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .copyright {
+            color: #666;
+            font-size: 12px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .navbar {
+                padding: 0 25px;
+            }
+
+            .search-small {
+                width: 180px;
+            }
+
+            .hero {
+                padding-left: 30px;
+            }
+
+            .hero h1 {
+                font-size: 48px;
+            }
+
+            .section {
+                padding-left: 30px;
+                padding-right: 30px;
+            }
+
+            .movie-card {
+                min-width: 170px;
+                width: 170px;
+            }
+
+            .movie-card img {
+                height: 245px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .navbar {
+                height: auto;
+                min-height: 75px;
+                padding: 15px 20px;
+                flex-wrap: wrap;
+            }
+
+            .logo {
+                margin-right: 15px;
+                font-size: 23px;
+            }
+
+            .nav-right {
+                margin-left: auto;
+            }
+
+            .search-small {
+                display: none;
+            }
+
+            .nav-links {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                gap: 18px;
+                padding-top: 10px;
+            }
+
+            .nav-links a {
+                font-size: 13px;
+            }
+
+            .hero {
+                height: 570px;
+                margin-top: 75px;
+                padding: 30px;
+                align-items: flex-end;
+                padding-bottom: 55px;
+            }
+
+            .hero h1 {
+                font-size: 40px;
+            }
+
+            .hero-description {
+                font-size: 14px;
+            }
+
+            .hero-meta {
+                gap: 9px;
+                font-size: 12px;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .section-heading h2 {
+                font-size: 20px;
+            }
+
+            .movie-card {
+                min-width: 155px;
+                width: 155px;
+            }
+
+            .movie-card img {
+                height: 225px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 25px;
+            }
+
+            .footer-links {
+                gap: 15px;
+            }
+
+            footer {
+                padding: 35px 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">STREAMFLIX</div>
+
+        <ul class="nav-links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="movies.html" class="active">Movies</a></li>
+            <li><a href="series.html">Series</a></li>
+            <li><a href="mylist.html">My List</a></li>
+        </ul>
+
+        <div class="nav-right">
+            <!-- Keep this search field -->
+            <input
+                type="text"
+                id="navSearchInput"
+                class="search-small"
+                placeholder="Search movies..."
+                aria-label="Search movies"
+            >
+
+            <a href="login.html" class="login-btn">Login</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-number">#1 Movie Today</div>
+
+            <h1>THE LAST MISSION</h1>
+
+            <div class="hero-meta">
+                <span>2026</span>
+                <span>•</span>
+                <span>Action</span>
+                <span>•</span>
+                <span>2h 12m</span>
+                <span>•</span>
+                <span>16+</span>
+            </div>
+
+            <p class="hero-description">
+                A highly trained operative is sent on a dangerous
+                mission deep inside enemy territory. With time
+                running out, he must complete the mission before
+                everything falls apart.
+            </p>
+
+            <button class="play-btn" type="button"
+                onclick="alert('The movie player will be added soon!')">
+                ▶ Play Now
+            </button>
+
+            <button class="more-btn" type="button"
+                onclick="alert('The Last Mission - 2026, Action, 2h 12m')">
+                ⓘ More Info
+            </button>
+        </div>
+    </section>
+
+    <!-- SEARCH RESULTS STATUS -->
+    <p id="searchStatus" aria-live="polite">Showing all movies.</p>
+
+    <p id="noResults" role="status">
+        No movies found. Try another title or genre.
+    </p>
+
+    <!-- TRENDING MOVIES -->
+    <section class="section movie-section">
+        <div class="section-heading">
+            <h2>Trending Movies</h2>
+            <a href="#" class="see-all">See All ›</a>
+        </div>
+
+        <div class="movie-row">
+            <div class="movie-card">
+                <img src="https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=500&q=85" alt="Desert Planet">
+                <div class="movie-info">
+                    <h3>Desert Planet</h3>
+                    <p class="movie-details">2026 • Sci-Fi</p>
+                    <span class="rating">★ 8.8</span>
+                    <span class="quality">HD</span>
+                </div>
+            </div>
+
+            <div class="movie-card">
+                <img src="https://images.unsplash.com/photo-1535016120720-40c646be5580?auto=format&fit=crop&w=500&q=85" alt="The Professor">
+                <div class="movie-info">
+                    <h3>The Professor</h3>
+                    <p class="movie-details">2025 • Drama</p>
+                    <span class="rating">★ 8.9</span>
+                    <span class="quality">HD</span>
+                </div>
+            </div>
+
+            <div class="movie-card">
+                <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=500&q=85" alt="Shadow Agent">
+                <div class="movie-info">
+                    <h3>Shadow Agent</h3>
+                    <p class="movie-details">2026 • Action</p>
+                    <span class="rating">★ 8.7</span>
+                    <span class="quality">HD</span>
+                </div>
+            </div>
+
+            <div class="movie-card">
+                <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=500&q=85" alt="Neon City">
+                <div class="movie-info">
+                    <h3>Neon City</h3>
+                    <p class="movie-details">2026 • Thriller</p>
+                    <span class="rating">★ 8.6</span>
+                    <span class="quality">HD</span>
+                </div>
+            </div>
+
+            <div class="movie-card">
+                <img src="https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=500&q=85" alt="The Journey">
+                <div class="movie-info">
+                    <h3>The Journey</h3>
+                    <p class="movie-details">2025 • Adventure</p>
+                    <span class="rating">★ 8.5</span>
+                    <span class="quality">HD</span>
+                </div>
+            </div>
+
+            <div class="movie-card">
+                <img src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=500&q=85" alt="Final Night">
+                <div class="movie-info">
+                    <h3>Final Night</h3>
+                    <p class="movie-details">2026 • Mystery</p>
+                    <span class="rating">★ 8.4</span>
+                    <span class="quality">HD</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- POPULAR MOVIES -->
+    <section class="section movie-section">
+        <div class="section-heading">
+            <h2>Popular Movies</h2>
+            <a href="#" class="see-all">See All ›</a>
+        </div>
+
+        <div class="movie-row">
+            <div class="movie-card">
+                <img src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=500&q=85" alt="Beyond Space">
+                <div class="movie-info">
+                    <h3>Beyond Space</h3>
+                    <p class="movie-details">2025 • Sci-Fi</p>
+                    <span class="rating">★ 8.6</span>
+                </div>
+            </div>
+
+            <div class="movie-card">
+                <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=500&q=85" alt="Frozen Earth">
+                <div class="movie-info">
+                    <h3>Frozen Earth</h3>
+                    <p class="movie-details">2025 • Adventure</p>
+                    <span class="rating">★ 8.3</span>
+                </div>
+            </div>
+
+            <div class="movie-card">
+                <img src="https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=500&q=85" alt="Wild Fire">
+                <div class="movie-info">
+                    <h3>Wild Fire</h3>
+                    <p class="movie-details">2026 • Action</p>
+                    <span class="rating">★ 8.1</span>
+                </div>
+            </div>
+
+            <div class="movie-card">
+                <img src="https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=500&q=85" alt="Red Horizon">
+                <div class="movie-info">
+                    <h3>Red Horizon</h3>
+                    <p class="movie-details">2026 • Thriller</p>
+                    <span class="rating">★ 8.7</span>
+                </div>
+            </div>
+
+            <div class="movie-card">
+                <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=500&q=85" alt="Into The Wild">
+                <div class="movie-info">
+                    <h3>Into The Wild</h3>
+                    <p class="movie-details">2025 • Adventure</p>
+                    <span class="rating">★ 8.8</span>
+                </div>
+            </div>
+
+            <div class="movie-card">
+                <img src="https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=500&q=85" alt="Golden Hour">
+                <div class="movie-info">
+                    <h3>Golden Hour</h3>
+                    <p class="movie-details">2026 • Drama</p>
+                    <span class="rating">★ 8.2</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEW RELEASES -->
+    <section class="section movie-section">
+        <div class="section-heading">
+            <h2>New Releases</h2>
+            <a href="#" class="see-all">See All ›</a>
+        </div>
+
+        <div class="movie-row">
+            <div class="movie-card">
+                <img src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=500&q=85" alt="The Summit">
+                <div class="movie-info">
+                    <h3>The Summit</h3>
+                    <p class="movie-details">2026 • Adventure</p>
+                    <span class="rating">★ 8.9</span>
+                </div>
+            </div>
+
+            <div class="movie-card">
+                <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=500&q=85" alt="Unknown Lands">
+                <div class="movie-info">
+                    <h3>Unknown Lands</h3>
+                    <p class="movie-details">2026 • Mystery</p>
+                    <span class="rating">★ 8.5</span>
+                </div>
+            </div>
+
+            <div class="movie-card">
+                <img src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=500&q=85" alt="Storm">
+                <div class="movie-info">
+                    <h3>Storm</h3>
+                    <p class="movie-details">2026 • Action</p>
+                    <span class="rating">★ 8.4</span>
+                </div>
+            </div>
+
+            <div class="movie-card">
+                <img src="https://images.unsplash.com/photo-1520637836862-4d197d17c92a?auto=format&fit=crop&w=500&q=85" alt="The Last Road">
+                <div class="movie-info">
+                    <h3>The Last Road</h3>
+                    <p class="movie-details">2026 • Drama</p>
+                    <span class="rating">★ 8.6</span>
+                </div>
+            </div>
+
+            <div class="movie-card">
+                <img src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=500&q=85" alt="Hidden Valley">
+                <div class="movie-info">
+                    <h3>Hidden Valley</h3>
+                    <p class="movie-details">2026 • Mystery</p>
+                    <span class="rating">★ 8.7</span>
+                </div>
+            </div>
+
+            <div class="movie-card">
+                <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=500&q=85" alt="Mountain Storm">
+                <div class="movie-info">
+                    <h3>Mountain Storm</h3>
+                    <p class="movie-details">2026 • Thriller</p>
+                    <span class="rating">★ 8.3</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <div>
+                <div class="footer-logo">STREAMFLIX</div>
+                <p class="footer-tagline">Movies. Anytime. Anywhere.</p>
+            </div>
+
+            <div class="footer-links">
+                <a href="#">About Us</a>
+                <a href="#">Help Center</a>
+                <a href="#">Terms of Use</a>
+                <a href="#">Privacy</a>
+                <a href="#">Contact</a>
+            </div>
+        </div>
+
+        <p class="copyright">
+            © 2026 StreamFlix. All rights reserved.
+        </p>
+    </footer>
+
+    <!-- JAVASCRIPT FOR THE NAVBAR SEARCH -->
+    <script>
+        function searchMovies() {
+            let searchText = document
+                .getElementById("navSearchInput")
+                .value
+                .trim()
+                .toLowerCase();
+
+            let movieCards = document.querySelectorAll(".movie-card");
+            let movieSections = document.querySelectorAll(".movie-section");
+            let visibleCount = 0;
+
+            movieCards.forEach(function(card) {
+                let titleElement = card.querySelector("h3");
+                let detailsElement = card.querySelector(".movie-details");
+                let imageElement = card.querySelector("img");
+
+                let title = titleElement
+                    ? titleElement.textContent.toLowerCase()
+                    : "";
+
+                let details = detailsElement
+                    ? detailsElement.textContent.toLowerCase()
+                    : "";
+
+                let imageAlt = imageElement
+                    ? imageElement.alt.toLowerCase()
+                    : "";
+
+                let matches =
+                    searchText === "" ||
+                    title.includes(searchText) ||
+                    details.includes(searchText) ||
+                    imageAlt.includes(searchText);
+
+                card.style.display = matches ? "" : "none";
+
+                if (matches) {
+                    visibleCount++;
+                }
+            });
+
+            movieSections.forEach(function(section) {
+                let cards = section.querySelectorAll(".movie-card");
+                let hasVisibleMovie = false;
+
+                cards.forEach(function(card) {
+                    if (card.style.display !== "none") {
+                        hasVisibleMovie = true;
+                    }
+                });
+
+                section.style.display = hasVisibleMovie ? "" : "none";
+            });
+
+            let noResults = document.getElementById("noResults");
+            let searchStatus = document.getElementById("searchStatus");
+
+            if (visibleCount === 0) {
+                noResults.style.display = "block";
+                searchStatus.textContent = "No matching movies found.";
+            } else {
+                noResults.style.display = "none";
+
+                if (searchText === "") {
+                    searchStatus.textContent = "Showing all movies.";
+                } else {
+                    searchStatus.textContent =
+                        visibleCount +
+                        (visibleCount === 1
+                            ? " movie found."
+                            : " movies found.");
+                }
+            }
+        }
+
+        let navSearchInput = document.getElementById("navSearchInput");
+
+        // Filter movies while typing in the navbar search field.
+        navSearchInput.addEventListener("input", searchMovies);
+
+        // Press Enter to scroll down to the movie results.
+        navSearchInput.addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                document.getElementById("searchStatus").scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
