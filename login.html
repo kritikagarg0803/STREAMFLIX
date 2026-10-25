@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamFlix - Login</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.85)),
+                url("https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1800&q=90");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+        }
+
+        .navbar {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            padding: 0 55px;
+            background: rgba(0,0,0,0.8);
+        }
+
+        .logo {
+            color: #e50914;
+            font-size: 30px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .home-link {
+            margin-left: auto;
+            color: white;
+            text-decoration: none;
+            font-size: 15px;
+        }
+
+        .home-link:hover {
+            color: #e50914;
+        }
+
+        .login-container {
+            min-height: calc(100vh - 120px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .login-box {
+            width: 420px;
+            background-color: rgba(0,0,0,0.88);
+            padding: 45px 50px;
+            border-radius: 6px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+
+        .login-box h1 {
+            font-size: 30px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            background-color: #333;
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: white;
+            outline: none;
+            font-size: 15px;
+        }
+
+        .input-group input::placeholder {
+            color: #aaa;
+        }
+
+        .input-group input:focus {
+            border-color: #777;
+            background-color: #3b3b3b;
+        }
+
+        .login-submit {
+            width: 100%;
+            padding: 14px;
+            background-color: #e50914;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .login-submit:hover {
+            background-color: #b20710;
+        }
+
+        .login-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            color: #aaa;
+            font-size: 12px;
+        }
+
+        .remember {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .remember input {
+            accent-color: #e50914;
+        }
+
+        .login-options a {
+            color: #aaa;
+            text-decoration: none;
+        }
+
+        .login-options a:hover {
+            text-decoration: underline;
+            color: white;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 30px 0;
+            color: #777;
+            font-size: 13px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background-color: #444;
+        }
+
+        .signup {
+            color: #aaa;
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+
+        .signup a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .signup a:hover {
+            text-decoration: underline;
+        }
+
+        .terms {
+            color: #777;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .terms a {
+            color: #aaa;
+            text-decoration: none;
+        }
+
+        .terms a:hover {
+            text-decoration: underline;
+        }
+
+        #message {
+            margin-top: 15px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        footer {
+            padding: 25px 50px;
+            background-color: rgba(0,0,0,0.85);
+            color: #666;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 0 25px;
+            }
+
+            .logo {
+                font-size: 25px;
+            }
+
+            .home-link {
+                font-size: 13px;
+            }
+
+            .login-container {
+                padding: 30px 15px;
+            }
+
+            .login-box {
+                width: 100%;
+                max-width: 400px;
+                padding: 35px 25px;
+            }
+
+            .login-box h1 {
+                font-size: 27px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">STREAMFLIX</div>
+
+        <!-- Do not allow bypassing the login page -->
+        <a href="login.html" class="home-link">← Back to Home</a>
+    </nav>
+
+    <main class="login-container">
+        <div class="login-box">
+
+            <h1>Sign In</h1>
+
+            <form id="loginForm">
+
+                <div class="input-group">
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="Email or mobile number"
+                        required
+                    >
+                </div>
+
+                <div class="input-group">
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Password"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="login-submit">
+                    Sign In
+                </button>
+
+                <p id="message" role="status"></p>
+
+            </form>
+
+            <div class="login-options">
+                <label class="remember">
+                    <input type="checkbox" id="remember">
+                    Remember me
+                </label>
+
+                <a href="#" id="forgotPassword">Forgot password?</a>
+            </div>
+
+            <div class="divider">OR</div>
+
+            <p class="signup">
+                New to StreamFlix?
+                <a href="#" id="signupLink">Sign up now.</a>
+            </p>
+
+            <p class="terms">
+                This page is protected by StreamFlix.
+                By continuing, you agree to our
+                <a href="#">Terms of Use</a> and
+                <a href="#">Privacy Policy</a>.
+            </p>
+
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 StreamFlix. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Demo credentials
+        const correctEmail = "ram@gmail.com";
+        const correctPassword = "Ram123";
+
+        const loginForm = document.getElementById("loginForm");
+        const message = document.getElementById("message");
+
+        // Redirect to login if the user is not authenticated
+        // This also handles someone returning to this page.
+        if (sessionStorage.getItem("isLoggedIn") === "true") {
+            window.location.replace("home.html");
+        }
+
+        loginForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+
+            if (
+                email === correctEmail &&
+                password === correctPassword
+            ) {
+                sessionStorage.setItem("isLoggedIn", "true");
+
+                message.style.color = "#4caf50";
+                message.textContent = "Login successful! Opening StreamFlix...";
+
+                window.location.href = "home.html";
+            } else {
+                message.style.color = "#ff5252";
+                message.textContent = "Invalid email or password. Please try again.";
+            }
+        });
+
+        document.getElementById("forgotPassword").addEventListener("click", function(event) {
+            event.preventDefault();
+            message.style.color = "#ffcc80";
+            message.textContent = "Password recovery is not available in this demo.";
+        });
+
+        document.getElementById("signupLink").addEventListener("click", function(event) {
+            event.preventDefault();
+            message.style.color = "#ffcc80";
+            message.textContent = "Registration is not available in this demo.";
+        });
+    </script>
+
+</body>
+</html>
